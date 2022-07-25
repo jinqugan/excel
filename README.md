@@ -1,15 +1,14 @@
-# Marketplace
+# Excel Setting
 
 1. composer install
 2. cp .env.example to .env
-    - edit db setting, APP_URL
+    - edit db setting
 3. php artisan key:generate
-4. php artisan db:seed
-5. php artisan queue:work
-   - edit mail setting (eg. mailtrap) in .env file to receive email notification
 
-# Swagger Documentations
+# Excel Formatting
 
-1. php artisan l5-swagger:generate
-2. open documents with the following link ${APP_URL}/api/docs
-   - eg. http://marketplace.test/api/docs
+1. php artisan excel:dir
+   - pre generate an empty folder if does not exist
+2. php artisan format:multi
+   - will modify all the excels file located at app\storage\excels\incomplete folder to      requested new excel format
+   - formatted file will be generate at app\storage\excels\completed folder

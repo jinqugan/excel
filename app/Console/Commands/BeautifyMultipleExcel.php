@@ -46,6 +46,7 @@ class BeautifyMultipleExcel extends Command
             $filename = pathinfo($excelFile, PATHINFO_FILENAME);
 
             if (in_array($excelFile, ['.', '..', '.DS_Store'])) {
+                unset($excelFiles[$key]);
                 continue;
             }
 
@@ -104,7 +105,11 @@ class BeautifyMultipleExcel extends Command
                     $seq++;
                     $subkey++;
                 }
-                
+            }
+
+            if (empty($records)) {
+                echo "no excels record found\n";
+                exit;
             }
 
             $row = 1;
@@ -163,6 +168,11 @@ class BeautifyMultipleExcel extends Command
 
             $writer->save($completedPath. DIRECTORY_SEPARATOR .$excelFile.'.xlsx');
             echo "done exported $excelFile to $completedPath\n\n";
+        }
+
+        if (empty($excelFiles)) {
+            echo "no excels found in $incompleteFile\n";
+            exit;
         }
     }
 
