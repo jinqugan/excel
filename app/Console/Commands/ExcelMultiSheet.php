@@ -114,8 +114,11 @@ class ExcelMultiSheet extends Command
                         $seq=0;
 
                         foreach ($sheetData as $num => $sheet) {
-                            if (count(array_filter($sheet)) <= 3) {
-                                continue;
+                            $check = array_filter($sheet);
+                            if (count($check) <= 3) {
+                                // if (!in_array('name', $check)) {
+                                    continue;
+                                // }
                             }
 
                             foreach ($sheet as $row => $value) {
@@ -133,6 +136,12 @@ class ExcelMultiSheet extends Command
                                 }
 
                                 if (!empty($headers[$row])) {
+                                    if ($headers[$row] == 'name') {
+                                        while (!ctype_alpha($value[0])) {
+                                            $value = ltrim($value, $value[0]);
+                                        }
+                                    }
+
                                     $records[$subkey][$headers[$row]] = $value;
                                 }
 
@@ -212,13 +221,14 @@ class ExcelMultiSheet extends Command
                         echo "=== end of ($currentFiles\\$totalFiles) === \n";
                         echo "done exported (folder:$excelFile) to $savedFiles\n\n";
 
-                        unset($records);
+                        $records = [];
                         $rowBegin = $row;
                     }
                 }
             }
 
         } catch(\Exception $ex) {
+            echo "sheetName: $sheetName\n";
             echo "something went wrong : \n";
             echo $ex->getMessage();
             echo "\n";
