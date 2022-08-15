@@ -111,14 +111,20 @@ class ExcelMultiSheet extends Command
 
                         // $worksheetsubs = $spreadsheetsub->getActiveSheet();
                         $headers = [];
-                        $seq=0;
-
+                        $seq=null;
                         foreach ($sheetData as $num => $sheet) {
                             $check = array_filter($sheet);
-                            if (count($check) <= 3) {
-                                // if (!in_array('name', $check)) {
-                                    continue;
-                                // }
+                            if (empty($check)) {
+                                continue;
+                            }
+
+                            $check = array_map('strtolower', $check);
+                            $check = array_map('trim', $check);
+
+                            if (is_null($seq) && in_array('name', $check)) {
+                                $seq=0;
+                            } elseif (is_null($seq)) {
+                                continue;
                             }
 
                             foreach ($sheet as $row => $value) {
@@ -136,8 +142,9 @@ class ExcelMultiSheet extends Command
                                 }
 
                                 if (!empty($headers[$row])) {
-                                    if ($headers[$row] == 'name') {
-                                        while (!ctype_alpha($value[0])) {
+                                    if ($headers[$row] == 'name' && strlen($value) > 0) {
+
+                                        while (strlen($value) > 0 && !ctype_alpha($value[0])) {
                                             $value = ltrim($value, $value[0]);
                                         }
                                     }
@@ -154,14 +161,16 @@ class ExcelMultiSheet extends Command
                         unset($sheetData);
                     }
 
-                    $mb = mb_strlen(serialize((array)$records), '8bit');
-                    $currentRecords = count($records);
-
                     echo "=== ($currentFiles\\$totalFiles) === \n";
                     echo "filename: $subfile\n";
-                    echo "size(mb): $mb\n";
-                    echo "current + previous = total record : $currentRecords + $rowBegin = ".( $rowBegin + $currentRecords)."\n";
+
                     if (!empty($records)) {
+                        $mb = mb_strlen(serialize($records), '8bit');
+                        $currentRecords = count($records);
+
+                        echo "size(mb): $mb\n";
+                        echo "current + previous = total (record) : $currentRecords + $rowBegin = ".( $rowBegin + $currentRecords)."\n";
+
                         $row = $rowBegin <= 0 ? 1 : $rowBegin;
                         $alpha = 'A';
 
@@ -221,15 +230,16 @@ class ExcelMultiSheet extends Command
                         echo "=== end of ($currentFiles\\$totalFiles) === \n";
                         echo "done exported (folder:$excelFile) to $savedFiles\n\n";
 
-                        $records = [];
                         $rowBegin = $row;
                     }
+
+                    $records = [];
                 }
             }
 
         } catch(\Exception $ex) {
             echo "sheetName: $sheetName\n";
-            echo "something went wrong : \n";
+            echo "something went wrong at line: ".$ex->getLine()."\n";
             echo $ex->getMessage();
             echo "\n";
             return false;
