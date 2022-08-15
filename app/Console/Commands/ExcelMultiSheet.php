@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\File;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Illuminate\Support\Arr;
 
+ini_set('memory_limit', '2048M');
+
 class ExcelMultiSheet extends Command
 {
     /**
@@ -44,6 +46,7 @@ class ExcelMultiSheet extends Command
         unset($excelFiles['..']);
         unset($excelFiles['.DS_Store']);
         $excelFiles = array_flip($excelFiles);
+        $totalMb = 0;
 
         try {
             if (empty($excelFiles)) {
@@ -66,7 +69,6 @@ class ExcelMultiSheet extends Command
                 }
 
                 $subfiles = scandir($subpath);
-                $headerScans = [];
                 $records = [];
                 $subkey=0;
                 $savedFiles = $completedPath. DIRECTORY_SEPARATOR .$excelFile.'.xlsx';
@@ -135,7 +137,6 @@ class ExcelMultiSheet extends Command
 
                                     if (!empty($value)) {
                                         $headers[$row] = $value;
-                                        $headerScans[$value] = $value;
                                     }
 
                                     continue;
@@ -166,9 +167,11 @@ class ExcelMultiSheet extends Command
 
                     if (!empty($records)) {
                         $mb = mb_strlen(serialize($records), '8bit');
+                        $totalMb += $mb;
                         $currentRecords = count($records);
 
                         echo "size(mb): $mb\n";
+                        echo "total size(mb): $totalMb\n";
                         echo "current + previous = total (record) : $currentRecords + $rowBegin = ".( $rowBegin + $currentRecords)."\n";
 
                         $row = $rowBegin <= 0 ? 1 : $rowBegin;
