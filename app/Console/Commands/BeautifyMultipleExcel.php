@@ -16,7 +16,7 @@ class BeautifyMultipleExcel extends Command
      *
      * @var string
      */
-    protected $signature = 'format:multi';
+    protected $signature = 'format:folder';
 
     /**
      * The console command description.
@@ -72,16 +72,16 @@ class BeautifyMultipleExcel extends Command
                 $spreadsheetsub = \PhpOffice\PhpSpreadsheet\IOFactory::load(
                     $subpath. DIRECTORY_SEPARATOR .$subfile
                 );
-                
+
                 $worksheetsubs = $spreadsheetsub->getActiveSheet();
                 $headers = [];
                 $seq=0;
                 foreach ($worksheetsubs->toArray() as $num => $sheet) {
-                    
+
                     if (count(array_filter($sheet)) <= 3) {
                         continue;
                     }
-                    
+
                     foreach ($sheet as $row => $value) {
                         $value = strtolower(trim($value));
 
@@ -95,7 +95,7 @@ class BeautifyMultipleExcel extends Command
 
                             continue;
                         }
-                        
+
                         if (!empty($headers[$row])) {
                             $records[$subkey][$headers[$row]] = $value;
                         }
@@ -131,7 +131,7 @@ class BeautifyMultipleExcel extends Command
             $worksheets->getCell($alpha++ . $row)->setValue('Mob 5');
             $worksheets->getCell($alpha++ . $row)->setValue('Category');
 
-            
+
             foreach (($records) as $key => $record) {
                 $row++;
                 $alpha = 'A';
@@ -198,7 +198,7 @@ class BeautifyMultipleExcel extends Command
         if (in_array($value, $names)) {
             $value = 'name';
         }
-        
+
         if (in_array(strtolower($value), $address1)) {
             $value = 'address1';
         }
